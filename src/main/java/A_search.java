@@ -157,7 +157,7 @@ public class A_search {
         //Load the file
         mySearch.loadFile();
         mySearch.test();
-        //Parse the nodes
+        //Load the nodes
         //generate the adjacency map
         //A* search
     }
@@ -165,7 +165,8 @@ public class A_search {
     public class Node {
         int x;
         int y;
-
+        double distance;
+        ArrayList<Nodes> neigbors;
 
         public Node(int x_coordinate, int y_coordinate) {
             x=x_coordinate;
@@ -215,8 +216,15 @@ public class A_search {
 
     public void getNodes()
     {
+        Node start;
+        Node end;
+        Node last;
+        Node now;
+
         for (int i=0; i<inputFile.length; i++)
         {
+            now=null;
+            last=null;
             for (int j=0; j<inputFile[i].length; j+=2)
             {
                 // all  even 0,2, 4 ... indexed strings end in comma
@@ -226,6 +234,25 @@ public class A_search {
                 {
                     inputFile[i][j+1]=inputFile[i][j+1].substring(0,inputFile[i][j+1].length()-2);
                 }
+                last=now;
+                now=new Node(Integer.parseInt(inputFile[i][j]),Integer.parseInt(inputFile[i][j+1]) )
+                if (last!=null)
+                    {
+                        now.neigbors.add(last);
+                        last.neigbors.add(now);
+                    }
+                if (j==0)
+                    {
+                        now=start;
+                    }
+                if (j==inputFile[i].length-1)
+                    {
+                        now=last;
+                        last.neigbors.add(start);
+                        start.neigbors.add(now);
+                    }
+                myNodes.add(now);
+
             }
             System.out.print("\n");
     }

@@ -132,6 +132,8 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.ArrayList;
 import java.util.regex.*;
+import java.awt.geom.Line2D.Double;
+import java.awt.geom.*;
 
 public class A_search {
     String[] inputArray;
@@ -143,6 +145,7 @@ public class A_search {
     String output="";
 
     ArrayList<Node> myNodes;
+    ArrayList<Line2D.Double> myEdges;
 
     //todo Constructor to pass the
 
@@ -166,7 +169,7 @@ public class A_search {
         int x;
         int y;
         double distance;
-        ArrayList<Nodes> neigbors;
+        ArrayList<Node> neigbors;
 
         public Node(int x_coordinate, int y_coordinate) {
             x=x_coordinate;
@@ -240,6 +243,7 @@ public class A_search {
                     {
                         now.neigbors.add(last);
                         last.neigbors.add(now);
+                        myEdges.add(new Line2D.double(now.x, now.y, last.x, last.y));
                     }
                 if (j==0)
                     {

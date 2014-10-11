@@ -132,7 +132,12 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.ArrayList;
 import java.util.regex.*;
+<<<<<<< HEAD
 import java.awt.geom.Line2D;
+=======
+import java.awt.geom.Line2D.Double;
+import java.awt.geom.*;
+>>>>>>> 08bde4538222cd3573631eabe250058887815cf4
 
 public class A_search {
 
@@ -145,9 +150,14 @@ public class A_search {
     //ArrayList<String> ltorgs = new ArrayList<String>();
     String output="";
 
+<<<<<<< HEAD
     ArrayList<Node> myNodes = new ArrayList<Node>();
     ArrayList<Line2D.Double> myEdges = new ArrayList<Line2D.Double>();
     ArrayList<Polygon> myPolygons = new ArrayList<Polygon>();
+=======
+    ArrayList<Node> myNodes;
+    ArrayList<Line2D.Double> myEdges;
+>>>>>>> 08bde4538222cd3573631eabe250058887815cf4
 
     //todo Constructor to pass the
 
@@ -173,7 +183,11 @@ public class A_search {
         int x;
         int y;
         double distance;
+<<<<<<< HEAD
         ArrayList<Node> neighbors;
+=======
+        ArrayList<Node> neigbors;
+>>>>>>> 08bde4538222cd3573631eabe250058887815cf4
 
         public Node(int x_coordinate, int y_coordinate) {
             x=x_coordinate;
@@ -402,6 +416,7 @@ public class A_search {
                 if (inputFile[i][j + 1].charAt(inputFile[i][j + 1].length() - 1) == ';') {
                     inputFile[i][j + 1] = inputFile[i][j + 1].substring(0, inputFile[i][j + 1].length() - 1);
                 }
+<<<<<<< HEAD
                 if (inputFile[i][j + 1].charAt(inputFile[i][j + 1].length() - 1) == ',') {
                     inputFile[i][j + 1] = inputFile[i][j + 1].substring(0, inputFile[i][j + 1].length() - 1);
                 }
@@ -414,6 +429,26 @@ public class A_search {
                 last = now;
 
                 now = new Node(Integer.parseInt(inputFile[i][j]), Integer.parseInt(inputFile[i][j + 1]));
+=======
+                last=now;
+                now=new Node(Integer.parseInt(inputFile[i][j]),Integer.parseInt(inputFile[i][j+1]) )
+                if (last!=null)
+                    {
+                        now.neigbors.add(last);
+                        last.neigbors.add(now);
+                        myEdges.add(new Line2D.double(now.x, now.y, last.x, last.y));
+                    }
+                if (j==0)
+                    {
+                        now=start;
+                    }
+                if (j==inputFile[i].length-1)
+                    {
+                        now=last;
+                        last.neigbors.add(start);
+                        start.neigbors.add(now);
+                    }
+>>>>>>> 08bde4538222cd3573631eabe250058887815cf4
                 myNodes.add(now);
                 if (last != null&&i>1) {
                     now.neighbors.add(last);

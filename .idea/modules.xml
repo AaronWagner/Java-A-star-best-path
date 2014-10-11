@@ -3,7 +3,10 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/A_star_search.iml" filepath="$PROJECT_DIR$/A_star_search.iml" />
+<<<<<<< HEAD
       <module fileurl="file://$PROJECT_DIR$/src/main/main.iml" filepath="$PROJECT_DIR$/src/main/main.iml" />
+=======
+>>>>>>> 08bde4538222cd3573631eabe250058887815cf4
     </modules>
   </component>
 </project>

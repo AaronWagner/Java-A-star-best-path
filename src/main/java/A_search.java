@@ -132,12 +132,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.ArrayList;
 import java.util.regex.*;
-<<<<<<< HEAD
 import java.awt.geom.Line2D;
-=======
-import java.awt.geom.Line2D.Double;
-import java.awt.geom.*;
->>>>>>> 08bde4538222cd3573631eabe250058887815cf4
 
 public class A_search {
 
@@ -150,14 +145,9 @@ public class A_search {
     //ArrayList<String> ltorgs = new ArrayList<String>();
     String output="";
 
-<<<<<<< HEAD
     ArrayList<Node> myNodes = new ArrayList<Node>();
     ArrayList<Line2D.Double> myEdges = new ArrayList<Line2D.Double>();
     ArrayList<Polygon> myPolygons = new ArrayList<Polygon>();
-=======
-    ArrayList<Node> myNodes;
-    ArrayList<Line2D.Double> myEdges;
->>>>>>> 08bde4538222cd3573631eabe250058887815cf4
 
     //todo Constructor to pass the
 
@@ -172,7 +162,8 @@ public class A_search {
         //Load the file
         mySearch.loadFile();
         mySearch.getNodes();
-        mySearch.testMap();
+        mySearch.check_adjacency();
+        //mySearch.testMap();
         //mySearch.test();
         //Load the nodes
         //generate the adjacency map
@@ -183,11 +174,7 @@ public class A_search {
         int x;
         int y;
         double distance;
-<<<<<<< HEAD
         ArrayList<Node> neighbors;
-=======
-        ArrayList<Node> neigbors;
->>>>>>> 08bde4538222cd3573631eabe250058887815cf4
 
         public Node(int x_coordinate, int y_coordinate) {
             x=x_coordinate;
@@ -219,6 +206,32 @@ public class A_search {
             }
             output+="\n\n";
             return (output);
+        }
+    }
+
+    public class Lineprinter
+    {
+        public String printline(Line2D.Double eachLine)
+        {
+            String output;
+            output=("("+eachLine.getX1()+","+eachLine.getY1()+") ("+eachLine.getX2()+","+eachLine.getY2()+")");
+            return output;
+        }
+
+        public boolean are_same_line(Line2D.Double linea,Line2D.Double lineb){
+            Boolean areSame=false;
+            if (linea.getX1()==lineb.getX1()&&linea.getY1()==lineb.getY1()&&linea.getX2()==lineb.getX2()&&linea.getY2()==lineb.getY2()) areSame=true;
+            if (linea.getX2()==lineb.getX1()&&linea.getY2()==lineb.getY1()&&linea.getX1()==lineb.getX2()&&linea.getY1()==lineb.getY2()) areSame=true;
+            return areSame;
+        }
+
+        public boolean share_endpoint (Line2D.Double linea, Line2D.Double lineb){
+            Boolean shareEndpoint=false;
+            if (linea.getX1()==lineb.getX1()&&linea.getY1()==lineb.getY1()) shareEndpoint=true;
+            if (linea.getX2()==lineb.getX1()&&linea.getY2()==lineb.getY1()) shareEndpoint=true;
+            if (linea.getX1()==lineb.getX2()&&linea.getY1()==lineb.getY2()) shareEndpoint=true;
+            if (linea.getX2()==lineb.getX2()&&linea.getY2()==lineb.getY2()) shareEndpoint=true;
+            return shareEndpoint;
         }
     }
 
@@ -297,11 +310,13 @@ public class A_search {
     {
         Boolean adjacent=true;
         Line2D.Double thispath;
+        Lineprinter printer = new Lineprinter();
         for (Node thisNode:myNodes)
         {
             adjacent=true;
             for (Node anotherNode: myNodes)
             {
+                adjacent=true;
                 if (thisNode.x==anotherNode.x&&thisNode.y==anotherNode.y)continue;
                 if (thisNode.is_neighbor(anotherNode))continue;
                 if (!adjacent)continue;
@@ -321,28 +336,43 @@ public class A_search {
                         continue;
                     }
                 }
+                if (anotherNode.x==0 && anotherNode.y==14 && thisNode.x==1 &&thisNode.y==3)
+                {
+                    System.out.println("1, 3 adjacency to 0,14 test: ."+adjacent+" after edge check\n");
+                }
                 for (Polygon eachPolygon:myPolygons)
                 {
+
                     if (!adjacent)continue;
+
+
+
                     for (Line2D.Double eachBlockingEdge: eachPolygon.blockinglines) {
-                        if (!adjacent) continue;
-                        //checks that the edge does not match a blocking edge
-                        if (thispath.getX1() == eachBlockingEdge.getX1() && thispath.getY1() == eachBlockingEdge.getY1() && thispath.getX2() == eachBlockingEdge.getX2() && thispath.getY2() == eachBlockingEdge.getY2()) {
-                            adjacent = false;
+                        boolean sharepoint=false;
+
+                        if (printer.are_same_line(eachBlockingEdge,thispath)) {
+                            adjacent=false;
                             continue;
                         }
-                        if (thispath.getX1() == eachBlockingEdge.getX2() && thispath.getY1() == eachBlockingEdge.getY2() && (thispath.getX2() == eachBlockingEdge.getX1() && thispath.getY2() == eachBlockingEdge.getY1())) {
-                            adjacent = false;
+                        if (printer.share_endpoint(eachBlockingEdge,thispath)){
+                            sharepoint=true;
                             continue;
                         }
-
-
-                        if (thispath.intersectsLine(eachBlockingEdge)) {
-                            adjacent = false;
-                            continue;
+                        if (!sharepoint) {
+                            if (thispath.intersectsLine(eachBlockingEdge)) {
+                                if (anotherNode.x == 0 && anotherNode.y == 14 && thisNode.x == 1 && thisNode.y == 3) {
+                                    System.out.println("1, 3 adjacency to 0,14 test:  failed on: " + printer.printline(thispath) + " and " + printer.printline(eachBlockingEdge) + " in after polygon check\n");
+                                }
+                                adjacent = false;
+                                continue;
+                            }
                         }
                     }
 
+                }
+                if (anotherNode.x==0 && anotherNode.y==14 && thisNode.x==1 &&thisNode.y==3)
+                {
+                    System.out.println("1, 3 adjacency to 0,14 test: ."+adjacent+" after polygon check\n");
                 }
 
                 if (adjacent)
@@ -416,7 +446,6 @@ public class A_search {
                 if (inputFile[i][j + 1].charAt(inputFile[i][j + 1].length() - 1) == ';') {
                     inputFile[i][j + 1] = inputFile[i][j + 1].substring(0, inputFile[i][j + 1].length() - 1);
                 }
-<<<<<<< HEAD
                 if (inputFile[i][j + 1].charAt(inputFile[i][j + 1].length() - 1) == ',') {
                     inputFile[i][j + 1] = inputFile[i][j + 1].substring(0, inputFile[i][j + 1].length() - 1);
                 }
@@ -429,26 +458,6 @@ public class A_search {
                 last = now;
 
                 now = new Node(Integer.parseInt(inputFile[i][j]), Integer.parseInt(inputFile[i][j + 1]));
-=======
-                last=now;
-                now=new Node(Integer.parseInt(inputFile[i][j]),Integer.parseInt(inputFile[i][j+1]) )
-                if (last!=null)
-                    {
-                        now.neigbors.add(last);
-                        last.neigbors.add(now);
-                        myEdges.add(new Line2D.double(now.x, now.y, last.x, last.y));
-                    }
-                if (j==0)
-                    {
-                        now=start;
-                    }
-                if (j==inputFile[i].length-1)
-                    {
-                        now=last;
-                        last.neigbors.add(start);
-                        start.neigbors.add(now);
-                    }
->>>>>>> 08bde4538222cd3573631eabe250058887815cf4
                 myNodes.add(now);
                 if (last != null&&i>1) {
                     now.neighbors.add(last);
@@ -495,4 +504,3 @@ public class A_search {
     */
 
 }
-

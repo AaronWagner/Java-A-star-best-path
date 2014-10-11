@@ -4,7 +4,7 @@
  CAP4630/CAP5605 Introduction to Artificial Intelligence
  Fall 2014
  Assignment 1
- Ching-­‐‑Hua Chuan (c.chuan@unf.edu)
+ Ching-- Hua Chuan (c.chuan@unf.edu)
  Due: October 6 (Monday)
  Total points: 100 (120)
  Consider the problem of finding the shortest path between two points on a place that
@@ -13,14 +13,14 @@
  a. Suppose the state space consists of all positions (x, y) in the plane. How many
  states are there? How many paths are there to the goal? [5 points]
  b. Explain briefly why the shortest path from one polygon vertex to any other in the
- scene must consist of straight-­‐‑line segments joining some of the vertices of the
+ scene must consist of straight-­line segments joining some of the vertices of the
  polygons. Define a good state space now. How large is this state space? [10
  points]
  c. Define the necessary functions to implement the search problem, including an
  ACTIONS function that takes a vertex as input and returns a set of vectors, each
  of which maps the current vertex to one of the vertices that can be reached in a
  2
- straight line. (Do not forget the neighbors on the same polygon.) Use the straight-­‐‑
+ straight line. (Do not forget the neighbors on the same polygon.) Use the straight-­
  line distance for the heuristic function. [10 points]
  d. Based on the vertices and edges of the polygonal obstacles shown above,
  manually calculate the shortest path from the source (1, 3) to the destination (34,
@@ -35,7 +35,7 @@
  Discuss how this environment changes the problem definition, and how to
  search for the shortest path.
  Details about the program:
- • The name of your program: aixxx.java (xxx are the last 3 digits of your n-­‐‑number).
+ • The name of your program: aixxx.java (xxx are the last 3 digits of your n-­number).
  • Input: a text file containing the coordinates of start point, goal point, and vertices
  of all polygons.
  For example, an input text file map1.txt contains:
@@ -117,9 +117,9 @@
 
 
 
-}
+ }
 
-        }
+ }
 
 
  */
@@ -132,8 +132,11 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.ArrayList;
 import java.util.regex.*;
+import java.awt.geom.Line2D;
 
 public class A_search {
+
+
     String[] inputArray;
     String[][] inputFile;
     String targetFile;
@@ -142,7 +145,9 @@ public class A_search {
     //ArrayList<String> ltorgs = new ArrayList<String>();
     String output="";
 
-    ArrayList<Node> myNodes;
+    ArrayList<Node> myNodes = new ArrayList<Node>();
+    ArrayList<Line2D.Double> myEdges = new ArrayList<Line2D.Double>();
+    ArrayList<Polygon> myPolygons = new ArrayList<Polygon>();
 
     //todo Constructor to pass the
 
@@ -156,7 +161,9 @@ public class A_search {
         A_search mySearch = new A_search(args);
         //Load the file
         mySearch.loadFile();
-        mySearch.test();
+        mySearch.getNodes();
+        mySearch.testMap();
+        //mySearch.test();
         //Load the nodes
         //generate the adjacency map
         //A* search
@@ -166,11 +173,170 @@ public class A_search {
         int x;
         int y;
         double distance;
-        ArrayList<Nodes> neigbors;
+        ArrayList<Node> neighbors;
 
         public Node(int x_coordinate, int y_coordinate) {
             x=x_coordinate;
             y=y_coordinate;
+            neighbors = new ArrayList<Node>();
+        }
+
+        public boolean is_neighbor(Node othernode)
+        {
+            boolean neighbor=false;
+            for (Node test: neighbors)
+            {
+                if (test.x==othernode.x&&test.y==othernode.y)
+                    neighbor=true;
+            }
+            return neighbor;
+        }
+
+        @Override
+        public String toString()
+        {
+            String output=new String("");
+            output+=new String("Node: ("+this.x+","+this.y+")\n)");
+            output+=new String("Neighors:");
+            for (Node myNeighbor: this.neighbors)
+            {
+                output+=new String("(,"+myNeighbor.x+","+myNeighbor.y+")\n)");
+                //output+=new String("\n");
+            }
+            output+="\n\n";
+            return (output);
+        }
+    }
+
+    public class Polygon {
+        ArrayList<Node> poly_nodes;
+        ArrayList<Line2D.Double> blockinglines;
+        //creates a set of lines
+        public Polygon (ArrayList<Node> nodes) {
+
+            blockinglines= new ArrayList<Line2D.Double>();
+            poly_nodes= new  ArrayList<Node>();
+
+            for (Node thisnode : nodes)
+            {
+                for (Node othernode:nodes)
+                {
+                    //check if same node
+                    if (thisnode.x==othernode.x&&thisnode.y==othernode.y)
+                        continue;
+                    else if (thisnode.is_neighbor(othernode))
+                        continue;
+                    else {
+                        blockinglines.add(new Line2D.Double(thisnode.x,thisnode.y,othernode.x, othernode.y));
+                    }
+
+                    //check if adjacent node
+
+                    //add a line to the node
+
+
+                }
+            }
+
+            for (Node thisnode: nodes)
+            {
+                poly_nodes.add(thisnode);
+            }
+        }
+
+        @Override
+        public String toString()
+        {
+            String output=new String("");
+            output+=("Polygon: \n");
+            output+=("Node: ");
+            for(Node thisnode:poly_nodes) {
+                output+=("(,"+thisnode.x+","+thisnode.y+")\n)");
+            }
+            for (Line2D.Double blockingLine: blockinglines)
+            {
+                output+=("Blocking Lines:");
+                output+=("("+blockingLine.getX1()+","+blockingLine.getY1()+") ("+blockingLine.getX2()+","+blockingLine.getY2()+") \n");
+            }
+            return(output);
+        }
+
+    }
+
+    public void testMap()
+    {
+        for (Node eachNode: myNodes)
+        {System.out.println(eachNode.toString());}
+        System.out.println("\n");
+        for (Polygon eachPolygon: myPolygons)
+        {System.out.println(eachPolygon.toString());}
+        System.out.println("\n Edges: \n");
+
+        for (Line2D.Double eachLine: myEdges)
+        {
+            System.out.println("("+eachLine.getX1()+","+eachLine.getY1()+") ("+eachLine.getX2()+","+eachLine.getY2()+")");
+        }
+
+    }
+
+    public void check_adjacency()
+    {
+        Boolean adjacent=true;
+        Line2D.Double thispath;
+        for (Node thisNode:myNodes)
+        {
+            adjacent=true;
+            for (Node anotherNode: myNodes)
+            {
+                if (thisNode.x==anotherNode.x&&thisNode.y==anotherNode.y)continue;
+                if (thisNode.is_neighbor(anotherNode))continue;
+                if (!adjacent)continue;
+
+                thispath=new Line2D.Double(thisNode.x,thisNode.y,anotherNode.x,anotherNode.y);
+                for (Line2D.Double eachEdges:myEdges)
+                {
+                    //If the points are the same then the lines don't cross
+                    if (thispath.getX1()==eachEdges.getX1()&&thispath.getY1()==eachEdges.getY1())continue;
+                    if (thispath.getX1()==eachEdges.getX2()&&thispath.getY1()==eachEdges.getY2())continue;
+                    if (thispath.getX2()==eachEdges.getX1()&&thispath.getY2()==eachEdges.getY1())continue;
+                    if (thispath.getX2()==eachEdges.getX2()&&thispath.getY2()==eachEdges.getY2())continue;
+
+                    if (thispath.intersectsLine(eachEdges))
+                    {
+                        adjacent=false;
+                        continue;
+                    }
+                }
+                for (Polygon eachPolygon:myPolygons)
+                {
+                    if (!adjacent)continue;
+                    for (Line2D.Double eachBlockingEdge: eachPolygon.blockinglines) {
+                        if (!adjacent) continue;
+                        //checks that the edge does not match a blocking edge
+                        if (thispath.getX1() == eachBlockingEdge.getX1() && thispath.getY1() == eachBlockingEdge.getY1() && thispath.getX2() == eachBlockingEdge.getX2() && thispath.getY2() == eachBlockingEdge.getY2()) {
+                            adjacent = false;
+                            continue;
+                        }
+                        if (thispath.getX1() == eachBlockingEdge.getX2() && thispath.getY1() == eachBlockingEdge.getY2() && (thispath.getX2() == eachBlockingEdge.getX1() && thispath.getY2() == eachBlockingEdge.getY1())) {
+                            adjacent = false;
+                            continue;
+                        }
+
+
+                        if (thispath.intersectsLine(eachBlockingEdge)) {
+                            adjacent = false;
+                            continue;
+                        }
+                    }
+
+                }
+
+                if (adjacent)
+                {
+                    thisNode.neighbors.add(anotherNode);
+                }
+
+            }
         }
     }
 
@@ -202,7 +368,7 @@ public class A_search {
             for (int i=0; i<inputArray.length; i++)
             {
                 inputFile[i]=inputArray[i].split("\\s+");
-               // System.out.print("Split a line");
+                // System.out.print("Split a line");
             }
 
             //int pants=0;
@@ -216,47 +382,67 @@ public class A_search {
 
     public void getNodes()
     {
-        Node start;
+        Node start=null;
         Node end;
         Node last;
         Node now;
+        ArrayList<Node> this_polygon = new ArrayList<Node>();
+        // i is rows
+        for (int i=0; i<inputFile.length; i++) {
+            now = null;
+            last = null;
 
-        for (int i=0; i<inputFile.length; i++)
-        {
-            now=null;
-            last=null;
-            for (int j=0; j<inputFile[i].length; j+=2)
-            {
+            //todo  first and last line will be single node lines: need to set those to
+            for (int j = 0; j < inputFile[i].length; j += 2) {
                 // all  even 0,2, 4 ... indexed strings end in comma
-                inputFile[i][j]=inputFile[i][j].substring(0,inputFile[i][j].length()-2);  // this line removes appended commas
 
-                if (inputFile[i][j+1].charAt(inputFile[i][j+1].length()-1)==';')
-                {
-                    inputFile[i][j+1]=inputFile[i][j+1].substring(0,inputFile[i][j+1].length()-2);
+
+                //inputFile[i][j] = inputFile[i][j].substring(0, inputFile[i][j].length() - 1);  // this line removes appended commas
+
+                if (inputFile[i][j + 1].charAt(inputFile[i][j + 1].length() - 1) == ';') {
+                    inputFile[i][j + 1] = inputFile[i][j + 1].substring(0, inputFile[i][j + 1].length() - 1);
                 }
-                last=now;
-                now=new Node(Integer.parseInt(inputFile[i][j]),Integer.parseInt(inputFile[i][j+1]) )
-                if (last!=null)
-                    {
-                        now.neigbors.add(last);
-                        last.neigbors.add(now);
-                    }
-                if (j==0)
-                    {
-                        now=start;
-                    }
-                if (j==inputFile[i].length-1)
-                    {
-                        now=last;
-                        last.neigbors.add(start);
-                        start.neigbors.add(now);
-                    }
+                if (inputFile[i][j + 1].charAt(inputFile[i][j + 1].length() - 1) == ',') {
+                    inputFile[i][j + 1] = inputFile[i][j + 1].substring(0, inputFile[i][j + 1].length() - 1);
+                }
+                if (inputFile[i][j].charAt(inputFile[i][j].length() - 1) == ';') {
+                    inputFile[i][j] = inputFile[i][j].substring(0, inputFile[i][j].length() - 1);
+                }
+                if (inputFile[i][j].charAt(inputFile[i][j].length() - 1) == ',') {
+                    inputFile[i][j] = inputFile[i][j].substring(0, inputFile[i][j].length() - 1);
+                }
+                last = now;
+
+                now = new Node(Integer.parseInt(inputFile[i][j]), Integer.parseInt(inputFile[i][j + 1]));
                 myNodes.add(now);
+                if (last != null&&i>1) {
+                    now.neighbors.add(last);
+                    last.neighbors.add(now);
+                    myEdges.add(new Line2D.Double(now.x, now.y, last.x, last.y));
+                }
+                if (j == 0) {
+                    start=now;
+                }
+                if (j == inputFile[i].length - 1) {
+                    last=now;
+                    last.neighbors.add(start);
+                    start.neighbors.add(now);
+                    myEdges.add(new Line2D.Double(start.x, start.y, last.x, last.y));
+                }
+                this_polygon.add(now);
+
 
             }
-            System.out.print("\n");
+            //System.out.print("\n");
+            if (i>1)
+            {
+                myPolygons.add(new Polygon(this_polygon));
+            }
+            this_polygon.clear();
+        }
     }
-    public void test()
+
+   /* public void test()
     {
 
         for (int i=0; i<inputFile.length; i++)
@@ -271,6 +457,7 @@ public class A_search {
         }
 
     }
-
+    */
 
 }
+

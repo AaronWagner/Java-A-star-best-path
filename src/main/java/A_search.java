@@ -158,11 +158,55 @@ public class A_search {
         mySearch.loadFile();
         mySearch.getNodes();
         mySearch.check_adjacency();
+        Node finish=mySearch.myNodes.get(1);
+        /*
+        for (Node everyNode: mySearch.myNodes)
+        {
+            everyNode.distance=Math.sqrt((everyNode.x-finish.x)*(everyNode.x-finish.x)+(everyNode.y-finish.y)*(everyNode.y-finish.y));
+            
+            
+      
+        }
+
+        for (Node everyNode:mySearch.myNodes)
+        {
+         System.out.println("("+everyNode.x+","+everyNode.y+") Distance:"+everyNode.distance);
+         System.out.println("Neighbors");
+         for (Node everyAjacent:everyNode.neighbors)
+            {
+               System.out.println("("+everyAjacent.x+","+everyAjacent.y+") Distance:"+everyNode.getDistance(everyAjacent));    
+            }
+         System.out.println("\n");   
+        
+        }
+        */
+
+        mySearch.aStar();
+        //mySearch.testComprable();
+
         //A* search
 
 
     }
-    public void Astar()
+    public void testComprable()
+    {
+        Collections.sort(myNodes, new Comparator<Node>(){
+            @Override
+            public int compare(Node node1, Node node2)
+            {
+                return node1.compareTo(node2);
+
+            }
+        });
+        System.out.println("Ordered Nodes:");
+        for(int i=0; i<myNodes.size(); i++)
+        {
+            System.out.println(myNodes.get(i).toString()+ "\nFscore:"+myNodes.get(i).f_score+"\n Camefrom:"+myNodes.get(i).cameFrom.toShortString()+"\n\n");
+        }
+
+    }
+
+    public void aStar()
     {
         Node start=myNodes.get(0);
         Node finish=myNodes.get(1);
@@ -192,32 +236,39 @@ public class A_search {
             });
 
             current=openset.get(0);
+            System.out.println(" Mt Bond is considering "+current.toString()+"It's score is: "+current.f_score);
+
             if (current==finish)
             {
                 reconstruct_path();
                 return;
             }
 
+
             openset.remove(current);
             closedset.add(current);
             for (Node neighbor: current.neighbors)
             {
                 if (closedset.contains(neighbor))continue;
-                tenGscore=gscore+neighbor.distance;
+                tenGscore=current.g_score+current.getDistance(neighbor);
 
-                if (!openset.contains(neighbor)||tenGscore<gscore)
+                if (!openset.contains(neighbor)||tenGscore<current.g_score)
                 {
+
                     neighbor.cameFrom=current;
                     neighbor.g_score=tenGscore;
                     neighbor.f_score=neighbor.g_score+neighbor.distance;
                     if (!openset.contains(neighbor))
                     {
                         openset.add(neighbor);
+                        System.out.println("Mr Bond went from "+current.toString()+" to "+neighbor.toString()+"\n Tenative score is:"+tenGscore);
+
                     }
                 }
 
             }
         }
+        //reconstruct_path();
     }
 
     public void reconstruct_path()
@@ -231,6 +282,8 @@ public class A_search {
             reverse_path.add(current);
             current=current.cameFrom;
         }
+        reverse_path.add(current);
+
         for (int i=reverse_path.size()-1; i>=0; i--)
         {
             forward_path.add(reverse_path.get(i));
@@ -256,14 +309,16 @@ public class A_search {
             x=x_coordinate;
             y=y_coordinate;
             neighbors = new ArrayList<Node>();
+            f_score=0;
+            cameFrom=this;
         }
 
         public int compareTo(Object other)
         {
 
-            if (this.distance == ((Node) other).distance)
+            if (this.f_score == ((Node) other).f_score)
                 return 0;
-            else if (this.distance > ((Node) other).distance)
+            else if (this.f_score > ((Node) other).f_score)
                 return 1;
             else
                 return -1;
@@ -302,6 +357,13 @@ public class A_search {
             output+="\n\n";
             return (output);
         }
+        public String toShortString()
+        {
+            String output=new String("");
+            output+=new String("Node: ("+this.x+","+this.y+")\n)");
+            return (output);
+        }
+
     }
 
     public class Lineprinter

@@ -124,14 +124,9 @@
 
  */
 
-import javax.swing.JOptionPane;
-import java.util.Scanner;
+import java.util.*;
 import java.lang.*;
 import java.io.*;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.ArrayList;
-import java.util.regex.*;
 import java.awt.geom.Line2D;
 
 public class A_search {
@@ -163,23 +158,116 @@ public class A_search {
         mySearch.loadFile();
         mySearch.getNodes();
         mySearch.check_adjacency();
-        //mySearch.testMap();
-        //mySearch.test();
-        //Load the nodes
-        //generate the adjacency map
         //A* search
+
+
+    }
+    public void Astar()
+    {
+        Node start=myNodes.get(0);
+        Node finish=myNodes.get(1);
+        Node current;
+        ArrayList<Node> closedset = new ArrayList<Node>();
+        List<Node> openset = new ArrayList<Node>();
+        ArrayList<Node> camefrom;
+        start.g_score =0;
+        Double fscore=start.g_score +start.distance;
+        Double gscore=0.0;
+        Double tenGscore;
+        for (Node everyNode: myNodes)
+        {
+            everyNode.distance=Math.sqrt((everyNode.x-finish.x)*(everyNode.x-finish.x)+(everyNode.y-finish.y)*(everyNode.y-finish.y));
+
+        }
+        current=start;
+        openset.add(start);
+        while (!openset.isEmpty()) {
+            Collections.sort(openset, new Comparator<Node>(){
+                @Override
+                public int compare(Node node1, Node node2)
+                {
+                    return node1.compareTo(node2);
+
+                }
+            });
+
+            current=openset.get(0);
+            if (current==finish)
+            {
+                reconstruct_path();
+                return;
+            }
+
+            openset.remove(current);
+            closedset.add(current);
+            for (Node neighbor: current.neighbors)
+            {
+                if (closedset.contains(neighbor))continue;
+                tenGscore=gscore+neighbor.distance;
+
+                if (!openset.contains(neighbor)||tenGscore<gscore)
+                {
+                    neighbor.cameFrom=current;
+                    neighbor.g_score=tenGscore;
+                    neighbor.f_score=neighbor.g_score+neighbor.distance;
+                    if (!openset.contains(neighbor))
+                    {
+                        openset.add(neighbor);
+                    }
+                }
+
+            }
+        }
     }
 
-    public class Node {
+    public void reconstruct_path()
+    {
+        Node current=myNodes.get(1);
+        Node start=myNodes.get(0);
+        ArrayList<Node> reverse_path= new ArrayList<Node>();
+        ArrayList<Node> forward_path= new ArrayList<Node>();
+        while (current.x!=start.x&&current.y!=start.y)
+        {
+            reverse_path.add(current);
+            current=current.cameFrom;
+        }
+        for (int i=reverse_path.size()-1; i>=0; i--)
+        {
+            forward_path.add(reverse_path.get(i));
+        }
+        System.out.println("the path is:");
+        for (Node step:forward_path)
+        {
+            System.out.print(step.toString());
+        }
+
+    }
+
+    public class Node implements Comparable{
         int x;
         int y;
         double distance;
+        double g_score;
+        double f_score;
         ArrayList<Node> neighbors;
+        Node cameFrom;
 
         public Node(int x_coordinate, int y_coordinate) {
             x=x_coordinate;
             y=y_coordinate;
             neighbors = new ArrayList<Node>();
+        }
+
+        public int compareTo(Object other)
+        {
+
+            if (this.distance == ((Node) other).distance)
+                return 0;
+            else if (this.distance > ((Node) other).distance)
+                return 1;
+            else
+                return -1;
+
         }
 
         public boolean is_neighbor(Node othernode)
@@ -192,6 +280,13 @@ public class A_search {
             }
             return neighbor;
         }
+
+        public Double getDistance(Node othernode)
+        {
+            Double distance=Math.sqrt((this.x-othernode.x)*(this.x-othernode.x)+(this.y-othernode.y)*(this.y-othernode.y));
+            return distance;
+        }
+
 
         @Override
         public String toString()
